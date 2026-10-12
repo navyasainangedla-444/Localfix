@@ -1,0 +1,18 @@
+{
+  "name": "Localfix",
+  "version": "1.0.0",
+  "description": "Local services booking marketplace",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.24.5",
+    "razorpay": "^2.9.8"
+  }
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Localfix – Book local services</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="welcome" class="welcome" role="dialog" aria-label="Welcome">
+  <div class="wbox">
+    <div class="wlogo">local<span>fix</span></div>
+    <h1>Welcome to Localfix</h1>
+    <p>Trusted local services, booked in a minute.</p>
+    <button class="btn" id="wgo" type="button">Get started</button>
+  </div>
+</div>
+<header>
+  <div class="logo">local<span>fix</span></div>
+  <nav aria-label="Sections">
+    <button id="nBrowse" aria-pressed="true">Browse</button>
+    <button id="nBook" aria-pressed="false" hidden>My bookings <span id="cnt"></span></button>
+    <button id="nDash" aria-pressed="false" hidden>Dashboard</button>
+    <button id="nAdm" aria-pressed="false" hidden>Admin</button>
+    <button id="nAuth">Login</button>
+  </nav>
+</header>
+<main>
+  <section id="browse">
+    <div class="hero">
+      <h1>Trusted help, a short ride away.</h1>
+      <div class="tools">
+        <input id="q" type="search" placeholder="Search plumber, tutor, salon, Ravi…" aria-label="Search services">
+        <select id="sort" aria-label="Sort">
+          <option value="rating">Top rated</option>
+          <option value="low">Price: low to high</option>
+          <option value="high">Price: high to low</option>
+        </select>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Categories"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+  <section id="mine" hidden>
+    <h1 style="max-width:none;font-size:34px">My bookings</h1>
+    <div class="list" id="list"></div>
+  </section>
+  <section id="dash" hidden>
+    <h1 style="max-width:none;font-size:34px">Provider dashboard</h1>
+    <p class="meta" id="dstats"></p>
+    <div class="chips" id="dfilter" role="group" aria-label="Filter bookings"></div>
+    <div class="list" id="dlist"></div>
+  </section>
+  <section id="adm" hidden>
+    <h1 style="max-width:none;font-size:34px">Admin panel</h1>
+    <p class="meta" id="astats"></p>
+    <div style="margin:12px 0"><button class="btn" id="addP" type="button">+ Add provider</button></div>
+    <div class="list" id="alist"></div>
+  </section>
+</main>
+
+<dialog id="adlg">
+  <form id="af" novalidate>
+    <h2 id="at">Login</h2>
+    <div id="sgn" hidden>
+      <div style="display:grid;gap:12px">
+        <label>Your name<input id="an" autocomplete="name"></label>
+        <label>Phone<input id="ap" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile"></label>
+      </div>
+    </div>
+    <label>Email<input id="ae" type="email" autocomplete="email" required></label>
+    <label>Password<input id="apw" type="password" autocomplete="current-password" required></label>
+    <div class="err" id="aerr" role="alert"></div>
+    <div class="acts">
+      <button type="button" class="btn sec" id="acx">Close</button>
+      <button type="submit" class="btn" id="ab">Login</button>
+    </div>
+    <button type="button" id="atg" style="background:none;border:0;color:var(--brand);text-align:left;padding:0;cursor:pointer;text-decoration:underline">New here? Create an account</button>
+  </form>
+</dialog>
+
+<dialog id="ddlg">
+  <form id="df" novalidate>
+    <h2>Pay online</h2>
+    <div class="tag" style="justify-self:start;background:var(--accent);color:#2a1a00">DEMO MODE · no real money</div>
+    <div class="meta" id="dinfo"></div>
+    <label>Payment method
+      <select id="dm">
+        <option value="upi">UPI</option>
+        <option value="card">Debit / Credit card</option>
+        <option value="bank">Net banking</option>
+      </select>
+    </label>
+    <div id="dupi"><div style="display:grid;gap:12px">
+      <label>UPI ID<input id="duid" placeholder="name@upi" autocomplete="off"></label>
+    </div></div>
+    <div id="dcard" hidden><div style="display:grid;gap:12px">
+      <label>Card number<input id="dcn" inputmode="numeric" placeholder="4111 1111 1111 1111" autocomplete="off"></label>
+      <div class="two">
+        <label>Expiry<input id="dce" placeholder="MM/YY" autocomplete="off"></label>
+        <label>CVV<input id="dcv" type="password" inputmode="numeric" maxlength="3" autocomplete="off"></label>
+      </div>
+    </div></div>
+    <div id="dbank" hidden><div style="display:grid;gap:12px">
+      <label>Bank
+        <select id="dbk"><option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option></select>
+      </label>
+    </div></div>
+    <div class="meta">Demo only. These details are not sent or saved.</div>
+    <div class="err" id="derr" role="alert"></div>
+    <div class="acts">
+      <button type="button" class="btn sec" id="dcx">Cancel</button>
+      <button type="submit" class="btn" id="dpb">Pay</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="pdlg">
+  <form id="pf" novalidate>
+    <h2 id="pt">Add provider</h2>
+    <label>Name<input id="pn"></label>
+    <label>Category<select id="pc"></select></label>
+    <label>Service<input id="ps" placeholder="e.g. Leak and tap repair"></label>
+    <div class="two">
+      <label>Price (₹)<input id="pp" type="number" min="1" step="1"></label>
+      <label>Per<input id="pu" placeholder="visit / hour"></label>
+    </div>
+    <label>Area<input id="pa"></label>
+    <div id="pnew">
+      <div style="display:grid;gap:12px">
+        <label>Provider login email<input id="pe" type="email"></label>
+        <label>Provider login password<input id="pw" type="password" placeholder="min 6 characters" autocomplete="new-password"></label>
+      </div>
+    </div>
+    <div class="err" id="perr" role="alert"></div>
+    <div class="acts">
+      <button type="button" class="btn sec" id="pcx">Close</button>
+      <button type="submit" class="btn" id="pb">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="rtdlg">
+  <form id="rtf" novalidate>
+    <h2>Rate your service</h2>
+    <div class="meta" id="rts"></div>
+    <label>Rating
+      <select id="rtv">
+        <option value="5">★★★★★ Excellent</option>
+        <option value="4">★★★★ Good</option>
+        <option value="3">★★★ Okay</option>
+        <option value="2">★★ Poor</option>
+        <option value="1">★ Bad</option>
+      </select>
+    </label>
+    <label>Review (optional)<textarea id="rtt" rows="3" maxlength="300"></textarea></label>
+    <div class="err" id="rterr" role="alert"></div>
+    <div class="acts">
+      <button type="button" class="btn sec" id="rtx">Close</button>
+      <button type="submit" class="btn" id="rtb">Submit review</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="rvdlg">
+  <div style="padding:20px;display:grid;gap:12px">
+    <h2 id="rvt" style="margin:0">Reviews</h2>
+    <div id="rvl" style="display:grid;gap:10px"></div>
+    <div class="acts"><button type="button" class="btn sec" id="rvx">Close</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlg">
+  <form id="f" method="dialog" novalidate>
+    <h2 id="dt">Book</h2>
+    <div class="meta" id="ds"></div>
+    <label>Your name<input id="fn" autocomplete="name" required></label>
+    <label>Phone<input id="fp" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile" required></label>
+    <div class="two">
+      <label>Date<input id="fd" type="date" required></label>
+      <label>Time<select id="ft"></select></label>
+    </div>
+    <label>Address<input id="fa" autocomplete="street-address" required></label>
+    <label>Notes (optional)<textarea id="fnote" rows="2"></textarea></label>
+    <fieldset style="border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:grid;gap:4px">
+      <legend class="meta">Payment</legend>
+      <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input type="radio" name="pm" value="online" checked style="padding:0;width:auto"> Pay online (UPI, card, netbanking)</label>
+      <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input type="radio" name="pm" value="cash" style="padding:0;width:auto"> Pay after service</label>
+    </fieldset>
+    <div class="err" id="fe" role="alert"></div>
+    <div class="acts">
+      <button type="button" class="btn sec" id="cx">Close</button>
+      <button type="submit" class="btn" id="sb">Confirm booking</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
