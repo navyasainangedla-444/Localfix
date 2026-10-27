@@ -18,6 +18,24 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Database connection (works on Vercel serverless and locally)
+let dbPromise = null;
+function connectDb() {
+  if (mongoose.connection.readyState === 1) return Promise.resolve();
+  if (!dbPromise) {
+    dbPromise = mongoose
+      .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/localfix")
+      .catch((e) => { dbPromise = null; throw e; });
+  }
+  return dbPromise;
+}
+app.use("/api", (req, res, next) => {
+  connectDb().then(() => next()).catch((e) => {
+    console.error("MongoDB connection failed:", e.message);
+    res.status(500).json({ error: "Database not reachable. Try again." });
+  });
+});
+
 // Razorpay is optional: without keys, only "Pay after service" works.
 const razorpay =
   process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
@@ -351,11 +369,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong. Try again." });
 });
 
-const PORT = process.env.PORT || 3000;
-mongoose
-  .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/localfix")
-  .then(() => app.listen(PORT, () => console.log("Localfix running at http://localhost:" + PORT)))
-  .catch((e) => {
-    console.error("MongoDB connection failed:", e.message);
-    process.exit(1);
-  });
+// Local run: node server.js. On Vercel the app is exported instead.
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  connectDb()
+    .then(() => app.listen(PORT, () => console.log("Localfix running at http://localhost:" + PORT)))
+    .catch((e) => {
+      console.error("MongoDB connection failed:", e.message);
+      process.exit(1);
+    });
+}
+module.exports = app;
