@@ -176,6 +176,7 @@
     $("ab").textContent = m === "login" ? "Login" : "Sign up";
     $("atg").textContent = m === "login" ? "New here? Create an account" : "Already have an account? Login";
     $("sgn").hidden = m === "login";
+    $("sgn2").hidden = m === "login";
     $("apw").autocomplete = m === "login" ? "current-password" : "new-password";
     $("aerr").textContent = "";
   }
