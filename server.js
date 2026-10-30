@@ -47,6 +47,13 @@ const DEMO = !razorpay && process.env.DEMO_PAYMENTS === "true";
 
 const TIMES = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
 const PHONE = /^[6-9]\d{9}$/;
+// Accepts +91 98765 43210, 91xxxxxxxxxx, 0xxxxxxxxxx and plain 10 digits
+const cleanPhone = (v) => {
+  let d = String(v || "").replace(/\D/g, "");
+  if (d.length === 12 && d.startsWith("91")) d = d.slice(2);
+  else if (d.length === 11 && d.startsWith("0")) d = d.slice(1);
+  return d;
+};
 const isId = (id) => mongoose.Types.ObjectId.isValid(id);
 const today = () => new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10); // India time
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next); // sends async errors to the error handler
@@ -76,7 +83,7 @@ function auth(roles) {
 app.post("/api/auth/signup", wrap(async (req, res) => {
   const name = String(req.body.name || "").trim();
   const email = String(req.body.email || "").trim().toLowerCase();
-  const phone = String(req.body.phone || "").replace(/\s/g, "");
+  const phone = cleanPhone(req.body.phone);
   const password = String(req.body.password || "");
   if (name.length < 2) return res.status(400).json({ error: "Enter your name." });
   if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ error: "Enter a valid email." });
@@ -117,10 +124,11 @@ app.get("/api/slots", wrap(async (req, res) => {
 
 // ---------- Customer routes ----------
 app.post("/api/bookings", auth(["customer"]), wrap(async (req, res) => {
-  const { provider, name, phone, date, time, address, note } = req.body;
+  const { provider, name, date, time, address, note } = req.body;
+  const phone = cleanPhone(req.body.phone);
   if (!isId(provider)) return res.status(400).json({ error: "Invalid provider" });
   if (!name || name.trim().length < 2) return res.status(400).json({ error: "Enter your name." });
-  if (!PHONE.test(phone || "")) return res.status(400).json({ error: "Enter a valid 10-digit mobile number." });
+  if (!PHONE.test(phone)) return res.status(400).json({ error: "Enter a valid 10-digit mobile number." });
   if (!date || date < today()) return res.status(400).json({ error: "Choose today or a future date." });
   if (!TIMES.includes(time)) return res.status(400).json({ error: "Choose a valid time slot." });
   if (!address || address.trim().length < 5) return res.status(400).json({ error: "Enter the full address for the visit." });
